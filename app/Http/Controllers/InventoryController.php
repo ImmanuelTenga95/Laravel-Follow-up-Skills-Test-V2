@@ -12,8 +12,7 @@ class InventoryController extends Controller
      */
     public function index()
     {
-        $products = Product::all();
-
+        $products = Product::orderBy('created_at', 'desc')->get();
         $totalValue = $products->sum(function ($product) {
             $total = $product->quantity_in_stock * $product->price_per_item;
             return $total;
@@ -40,7 +39,7 @@ class InventoryController extends Controller
         $validated = $request->validate([
             'name' => 'required|string',
             'quantity_in_stock' => 'required|integer',
-            'price_per_item' => 'required|integer',
+            'price_per_item' => 'required|numeric',
         ],
     );
 
@@ -71,7 +70,13 @@ class InventoryController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $product = Product::find($id);
+
+        if (!$product) {
+            return response()->json(['error' => 'Product not found'], 404);
+        }
+
+        return response()->json($product);
     }
 
     /**
@@ -79,7 +84,27 @@ class InventoryController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string',
+            'quantity_in_stock' => 'required|integer',
+            'price_per_item' => 'required|numeric',
+        ],);
+
+        $product = Product::findorFail($id);
+
+      
+
+        if ($product) {
+            $updated = $product->update([
+                'name' => $validated['name'],
+                'quantity_in_stock' => $validated['quantity_in_stock'],
+                'price_per_item' => $validated['price_per_item'],
+            ]);
+
+            if ($updated) {
+                return response()->json(['message' => 'Product updated successfully']);
+            }
+        }
     }
 
     /**

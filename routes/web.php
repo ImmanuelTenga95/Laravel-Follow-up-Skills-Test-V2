@@ -18,4 +18,11 @@ use Illuminate\Support\Facades\Route;
 //     return view('home');
 // });
 
-Route::resource('/', InventoryController::class);
+Route::get('/', [InventoryController::class, 'index'])->name('index');
+
+Route::post('/', [InventoryController::class, 'store'])->name('store');
+
+Route::get('/{id}/edit', [InventoryController::class, 'edit'])->name('edit');
+Route::put('/{id}', [InventoryController::class, 'update'])->name('update');
+ 
+Route::delete('/{id}', [InventoryController::class, 'destroy'])->name('destroy');
